@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Formulario Ford</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Ford_logo_flat.svg" alt="Ford Logo" width="50" class="me-2" />
+         Ford Motor Company
+      </a>
+
+ <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="Index.html">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="nosotros.html">Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link active" href="modelos.html">Modelos</a></li>
+          <li class="nav-item"><a class="nav-link" href="registros.html">Registros</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+    </div>
+  </nav>
+
+  
+
+ 
+  <main class="container my-5">
+    <h1 class="text-center text-primary mb-4">Registro de Clientes Ford</h1>
+    <form class="needs-validation" novalidate>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="nombre" class="form-label">Nombre completo</label>
+          <input type="text" class="form-control" id="nombre" required />
+          <div class="invalid-feedback">Por favor ingresa el nombre.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="identidad" class="form-label">Identidad</label>
+          <input type="number" class="form-control" id="identidad" required />
+          <div class="invalid-feedback">Por favor ingresa la identidad.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="edad" class="form-label">Edad</label>
+          <input type="number" class="form-control" id="edad" required />
+          <div class="invalid-feedback">Por favor ingresa la edad.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="carrera" class="form-label">Modelo Ford de Interés</label>
+          <select class="form-select" id="carrera" required>
+            <option value="" disabled selected>Selecciona un modelo Ford</option>
+            <option value="Ranger">Ranger</option>
+            <option value="Escape">Escape</option>
+            <option value="Explorer">Explorer</option>
+            <option value="F-150">F-150</option>
+            <option value="Bronco">Bronco</option>
+            <option value="Mustang">Mustang</option>
+          </select>
+          <div class="invalid-feedback">Por favor selecciona un modelo.</div>
+        </div>
+
+        <div class="col-12 d-flex flex-wrap gap-2 mt-3">
+          <button type="button" class="btn btn-success" onclick="cargarArreglo()">Guardar</button>
+          <button type="button" class="btn btn-primary" onclick="actualizarEstudiante()">Actualizar</button>
+          <button type="button" class="btn btn-danger" onclick="eliminarEstudiante()">Eliminar</button>
+          <button type="button" class="btn btn-warning text-white" onclick="buscarEstudiante()">Buscar</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- TABLA -->
+    <hr class="my-5" />
+    <h2 class="text-center text-primary mb-4">Lista de Clientes</h2>
+    <div class="table-responsive">
+      <table class="table table-bordered text-center" id="estudiantes">
+        <thead class="table-primary">
+          <tr>
+            <th>Nombre</th>
+            <th>Identidad</th>
+            <th>Edad</th>
+            <th>Modelo Ford</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+  <script>
+    let estudiantes = [];
+    window.onload = cargarDesdeLocalStorage;
+
+    function cargarArreglo() {
+      let nombre = document.getElementById('nombre').value.trim();
+      let identidad = document.getElementById('identidad').value.trim();
+      let edad = document.getElementById('edad').value.trim();
+      let carrera = document.getElementById('carrera').value;
+
+      if (!nombre || !identidad || !edad || !carrera) {
+        Swal.fire({ icon: 'error', title: 'Todos los campos son obligatorios' });
+        return;
+      }
+
+      let existe = estudiantes.find(est => est.identidad === identidad);
+      if (existe) {
+        Swal.fire({ icon: 'warning', title: 'Este cliente ya está registrado' });
+        return;
+      }
+
+      estudiantes.push({ nombre, identidad, edad, carrera });
+      guardarEnLocalStorage();
+      limpiarFormulario();
+      mostrarEstudiantes();
+      Swal.fire({ icon: 'success', title: 'Cliente guardado correctamente' });
+    }
+
+    function mostrarEstudiantes() {
+      let tabla = document.querySelector('#estudiantes tbody');
+      tabla.innerHTML = '';
+      estudiantes.forEach(est => {
+        tabla.innerHTML += `
+          <tr>
+            <td>${est.nombre}</td>
+            <td>${est.identidad}</td>
+            <td>${est.edad}</td>
+            <td>${est.carrera}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function buscarEstudiante() {
+      let identidad = document.getElementById('identidad').value.trim();
+      if (!identidad) {
+        Swal.fire({ icon: 'error', title: 'Ingresa una identidad para buscar' });
+        return;
+      }
+
+      let estudiante = estudiantes.find(est => est.identidad === identidad);
+      if (estudiante) {
+        document.getElementById('nombre').value = estudiante.nombre;
+        document.getElementById('edad').value = estudiante.edad;
+        document.getElementById('carrera').value = estudiante.carrera;
+        Swal.fire({ icon: 'info', title: 'Cliente encontrado' });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Cliente no encontrado' });
+      }
+    }
+
+    function actualizarEstudiante() {
+      let nombre = document.getElementById('nombre').value.trim();
+      let identidad = document.getElementById('identidad').value.trim();
+      let edad = document.getElementById('edad').value.trim();
+      let carrera = document.getElementById('carrera').value;
+
+      if (!nombre || !identidad || !edad || !carrera) {
+        Swal.fire({ icon: 'error', title: 'Todos los campos son obligatorios' });
+        return;
+      }
+
+      let i = estudiantes.findIndex(est => est.identidad === identidad);
+      if (i !== -1) {
+        estudiantes[i] = { nombre, identidad, edad, carrera };
+        guardarEnLocalStorage();
+        limpiarFormulario();
+        mostrarEstudiantes();
+        Swal.fire({ icon: 'success', title: 'Cliente actualizado correctamente' });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Cliente no encontrado' });
+      }
+    }
+
+    function eliminarEstudiante() {
+      let identidad = document.getElementById('identidad').value.trim();
+      if (!identidad) {
+        Swal.fire({ icon: 'error', title: 'Ingresa una identidad para eliminar' });
+        return;
+      }
+
+      let i = estudiantes.findIndex(est => est.identidad === identidad);
+      if (i !== -1) {
+        estudiantes.splice(i, 1);
+        guardarEnLocalStorage();
+        limpiarFormulario();
+        mostrarEstudiantes();
+        Swal.fire({ icon: 'success', title: 'Cliente eliminado correctamente' });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Cliente no encontrado' });
+      }
+    }
+
+    function guardarEnLocalStorage() {
+      localStorage.setItem('estudiantes', JSON.stringify(estudiantes));
+    }
+
+    function cargarDesdeLocalStorage() {
+      let datos = localStorage.getItem('estudiantes');
+      if (datos) {
+        estudiantes = JSON.parse(datos);
+        mostrarEstudiantes();
+      }
+    }
+
+    function limpiarFormulario() {
+      document.getElementById('nombre').value = '';
+      document.getElementById('identidad').value = '';
+      document.getElementById('edad').value = '';
+      document.getElementById('carrera').selectedIndex = 0;
+    }
+
+    
+    (() => {
+      'use strict';
+      const forms = document.querySelectorAll('.needs-validation');
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
+  </script>
+</body>
+</html>
